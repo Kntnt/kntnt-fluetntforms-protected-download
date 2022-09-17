@@ -5,7 +5,7 @@
  * Plugin Name:       Kntnt Protected Downloads for Fluent Forms
  * Plugin URI:        https://www.kntnt.com/
  * Description:       Provides a way to send unique onetime download links after filling out a form by Fluent Forms.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            Thomas Barregren
  * Author URI:        https://www.kntnt.com/
  * License:           GPL-3.0+
@@ -14,14 +14,14 @@
 
 /**
  * To use this plugin, add two hidden fields to your form that maps a token to
- * an attachment post id.
+ * an attachment post id:
  *
  * Admin Field Label: Download Token
  * Default Value: {random_string.}
  * Name Attribute: kntnt_fluentforms_protected_downloads_token
  *
  * Admin Field Label: Media ID
- * Default Value: The Post ID of the attachemnt containing the asset to be downloaded (e.g. 1139)
+ * Default Value: The Post ID of the attachment containing the asset to be downloaded (e.g. 1139)
  * Name Attribute: kntnt_fluentforms_protected_downloads_media
  *
  * Optionally, add a hidden field with the path that should be used for
@@ -32,9 +32,9 @@
  * Default Value: The desired path (e.g. /assets/e-books)
  * Name Attribute: kntnt_fluentforms_protected_downloads_path
  *
- * Optionally, add a hidden field with the minimum of time the download token
- * should be valid. Default is half hour. Download tokens are checked hourly.
- * Any older than the value provided will be made invalid.
+ * Optionally, add a hidden field with the minimum number of hours the download
+ * token should be valid. Default is one hour. Download tokens are checked
+ * hourly. Any older than the value provided will be made invalid.
  *
  * Admin Field Label: Minimum Lifetime
  * Default Value: The desired minimum lifetime in seconds
@@ -63,15 +63,13 @@ class Plugin {
         if (($token = $data['kntnt_fluentforms_protected_downloads_token'] ?? null) && ($media = $data['kntnt_fluentforms_protected_downloads_media'] ?? null)) {
 
             $path = $data['kntnt_fluentforms_protected_downloads_path'] ?? '/download';
-            $expires = time() + ($data['kntnt_fluentforms_protected_downloads_expires'] ?? 1800);
-            $error = $data['kntnt_fluentforms_protected_downloads_path'] ?? null;
+            $expires = time() + 3600 * ($data['kntnt_fluentforms_protected_downloads_expires'] ?? 1);
 
             $maps = get_option('kntnt_fluentforms_protected_downloads_maps', []);
             $maps[$token] = [
                 'media' => $media,
-                'path' => "$path",
+                'path' => $path,
                 'expires' => $expires,
-                'error' => $error,
             ];
             update_option('kntnt_fluentforms_protected_downloads_maps', $maps, false);
 
