@@ -5,7 +5,7 @@
  * Plugin Name:       Kntnt Protected Downloads for Fluent Forms
  * Plugin URI:        https://www.kntnt.com/
  * Description:       Provides a way to send unique onetime download links after filling out a form by Fluent Forms.
- * Version:           1.1.0
+ * Version:           1.1.1
  * Author:            Thomas Barregren
  * Author URI:        https://www.kntnt.com/
  * License:           GPL-3.0+
@@ -83,6 +83,9 @@ class Plugin {
     }
 
     public function intercept_requests() {
+
+        $this->kntnt_fluentforms_protected_downloads_maintenance();
+
         if (($n = strrpos($_SERVER['REQUEST_URI'], '/')) > 0) {
             $path = substr($_SERVER['REQUEST_URI'], 0, $n);
             $paths = get_option('kntnt_fluentforms_protected_downloads_paths', []);
@@ -112,7 +115,7 @@ class Plugin {
                 unset($maps[$token]);
             }
         }
-        update_option('kntnt_fluentforms_protected_downloads_map', $maps, false);
+        update_option('kntnt_fluentforms_protected_downloads_maps', $maps, false);
 
         $paths = get_option('kntnt_fluentforms_protected_downloads_paths', []);
         foreach ($paths as $path => $expires) {
